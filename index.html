@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-title" content="آشپزخانه">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-192.png">
-<title>آشپزخانه ما</title>
+<title>آشپزخانه من</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700&display=swap" rel="stylesheet">
 <style>
@@ -155,7 +155,7 @@ body { font-family: 'Vazirmatn', sans-serif; background: var(--bg); color: var(-
 
 <header class="app-header">
   <div class="header-top">
-    <div class="app-title">🍳 آشپزخانه ما</div>
+    <div class="app-title">🍳 آشپزخانه من</div>
     <div style="display:flex;align-items:center;gap:8px">
       <span id="sync-indicator" title="وضعیت اتصال"><span class="sync-dot syncing"></span></span>
       <span class="count-badge" id="count-badge">۰ دستور</span>
@@ -171,7 +171,7 @@ body { font-family: 'Vazirmatn', sans-serif; background: var(--bg); color: var(-
 <div id="install-banner-wrap"></div>
 <div class="filters-wrap" id="filters-wrap"></div>
 <div class="grid" id="grid"></div>
-<button class="fab" onclick="openAdd()">＋ دستور جدید</button>
+<button class="fab hidden" id="fab-btn" onclick="openAdd()">＋ دستور جدید</button>
 
 <!-- ADD/EDIT MODAL -->
 <div class="overlay" id="add-overlay" onclick="overlayClick(event,'add-overlay',closeAdd)">
@@ -263,8 +263,11 @@ window._signOut = async function() {
 onAuthStateChanged(auth, user => {
   currentUser = user;
   renderAuthBtn();
-  const fab = document.querySelector('.fab');
-  if (fab) fab.classList.toggle('hidden', !user);
+  const fab = document.getElementById('fab-btn');
+  if (fab) {
+    if (user) { fab.classList.remove('hidden'); }
+    else { fab.classList.add('hidden'); }
+  }
   renderAll();
 });
 
