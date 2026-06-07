@@ -9,137 +9,113 @@
 <meta name="apple-mobile-web-app-title" content="آشپزخانه">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-192.png">
-<title>آشپزخانه ما</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
+<title>آشپزخانه من</title>
 <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #FDF8F3; --card: #FFFFFF; --accent: #C0622F; --accent2: #E8956D;
-  --text: #2C1810; --muted: #8B6E5A; --border: #E8D5C4; --fav: #E24B4A;
-  --tag-bg: #F5EAE0; --shadow: 0 2px 12px rgba(44,24,16,0.08);
+  --bg:#FDF8F3;--card:#FFF;--accent:#C0622F;--accent2:#E8956D;
+  --text:#2C1810;--muted:#8B6E5A;--border:#E8D5C4;--fav:#E24B4A;--tag-bg:#F5EAE0;
+  --shadow:0 2px 12px rgba(44,24,16,0.08);
 }
-* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-body { font-family: 'Vazirmatn', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overscroll-behavior: none; }
-
-.app-header { background: var(--accent); padding: 1rem 1rem 0.75rem; position: sticky; top: 0; z-index: 50; box-shadow: 0 2px 10px rgba(192,98,47,0.3); }
-.header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; }
-.app-title { color: #FFF; font-size: 19px; font-weight: 700; display: flex; align-items: center; gap: 7px; }
-.count-badge { background: rgba(255,255,255,0.2); color: #FFF; font-size: 12px; padding: 3px 10px; border-radius: 20px; }
-.sync-dot { width: 8px; height: 8px; border-radius: 50%; background: #4CAF50; display: inline-block; margin-right: 4px; }
-.sync-dot.syncing { background: #FFC107; animation: pulse 1s infinite; }
-.sync-dot.error { background: #F44336; }
-@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
-.search-wrap { position: relative; }
-.search-wrap input { width: 100%; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); border-radius: 10px; padding: 9px 36px 9px 12px; font-size: 14px; color: #FFF; font-family: 'Vazirmatn', sans-serif; outline: none; }
-.search-wrap input::placeholder { color: rgba(255,255,255,0.6); }
-.search-icon { position: absolute; right: 11px; top: 50%; transform: translateY(-50%); color: rgba(255,255,255,0.7); }
-
-.filters-wrap { background: var(--card); border-bottom: 1px solid var(--border); padding: 0.6rem 1rem; display: flex; align-items: center; gap: 6px; overflow-x: auto; scrollbar-width: none; }
-.filters-wrap::-webkit-scrollbar { display: none; }
-.filter-btn { white-space: nowrap; padding: 5px 13px; border-radius: 20px; border: 1.5px solid var(--border); background: transparent; color: var(--muted); font-size: 13px; font-family: 'Vazirmatn', sans-serif; cursor: pointer; font-weight: 500; flex-shrink: 0; }
-.filter-btn.active { background: var(--accent); color: #FFF; border-color: var(--accent); }
-.filter-manage-btn { flex-shrink: 0; width: 32px; height: 32px; border-radius: 50%; border: 1.5px dashed var(--border); background: transparent; color: var(--muted); font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-
-.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(155px, 1fr)); gap: 12px; padding: 1rem 1rem 7rem; }
-.recipe-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 1rem; cursor: pointer; box-shadow: var(--shadow); position: relative; transition: transform 0.12s; }
-.recipe-card:active { transform: scale(0.97); }
-.card-emoji { font-size: 32px; margin-bottom: 8px; display: block; }
-.card-name { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 5px; line-height: 1.4; }
-.card-info { font-size: 12px; color: var(--muted); }
-.card-tag { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 20px; background: var(--tag-bg); color: var(--accent); font-weight: 500; margin-top: 8px; }
-.fav-dot { position: absolute; top: 9px; left: 9px; font-size: 14px; display: none; }
-.fav-dot.show { display: block; }
-.empty { grid-column: 1/-1; text-align: center; padding: 4rem 1rem; color: var(--muted); }
-.empty-emoji { font-size: 48px; margin-bottom: 12px; }
-
-/* LOADING */
-.loading-screen { position: fixed; inset: 0; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 999; gap: 16px; }
-.loading-screen .spinner { width: 40px; height: 40px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
-@keyframes spin { to { transform: rotate(360deg); } }
-.loading-screen p { color: var(--muted); font-size: 14px; }
-
-.fab.hidden { display: none; }
-.fab { position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%); background: var(--accent); color: #FFF; border: none; border-radius: 50px; padding: 13px 26px; font-size: 16px; font-family: 'Vazirmatn', sans-serif; font-weight: 700; cursor: pointer; box-shadow: 0 4px 20px rgba(192,98,47,0.4); display: flex; align-items: center; gap: 8px; z-index: 100; }
-
-.overlay { display: none; position: fixed; inset: 0; background: rgba(44,24,16,0.45); z-index: 200; align-items: flex-end; justify-content: center; }
-.overlay.open { display: flex; }
-.sheet { background: var(--card); border-radius: 20px 20px 0 0; width: 100%; max-width: 520px; max-height: 92vh; overflow-y: auto; padding: 1.25rem 1rem 2.5rem; animation: slideUp 0.22s ease; }
-@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-.sheet-handle { width: 36px; height: 4px; background: var(--border); border-radius: 4px; margin: 0 auto 1.1rem; }
-.sheet-title { font-size: 17px; font-weight: 700; margin-bottom: 1.1rem; }
-
-.form-group { margin-bottom: 0.9rem; }
-.form-group label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 4px; font-weight: 500; }
-.form-group input, .form-group select, .form-group textarea { width: 100%; background: #FFF; border: 1.5px solid var(--border); border-radius: 10px; padding: 10px 12px; font-size: 14px; color: var(--text); font-family: 'Vazirmatn', sans-serif; outline: none; }
-.form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--accent2); }
-.form-group textarea { min-height: 85px; resize: vertical; }
-.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.emoji-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 5px; margin-top: 4px; }
-.emoji-opt { font-size: 20px; text-align: center; padding: 5px; border-radius: 8px; cursor: pointer; border: 2px solid transparent; }
-.emoji-opt.sel { border-color: var(--accent); background: var(--tag-bg); }
-.btn-row { display: grid; grid-template-columns: 1fr 2fr; gap: 10px; margin-top: 1.1rem; }
-.btn-cancel { background: var(--tag-bg); border: none; border-radius: 10px; padding: 12px; font-size: 15px; font-family: 'Vazirmatn', sans-serif; color: var(--muted); cursor: pointer; font-weight: 500; }
-.btn-save { background: var(--accent); border: none; border-radius: 10px; padding: 12px; font-size: 15px; font-family: 'Vazirmatn', sans-serif; color: #FFF; cursor: pointer; font-weight: 700; }
-.btn-save:disabled { opacity: 0.6; }
-
-.detail-emoji { font-size: 46px; text-align: center; margin-bottom: 6px; }
-.detail-title { font-size: 21px; font-weight: 700; text-align: center; margin-bottom: 6px; }
-.detail-meta { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; font-size: 13px; margin-bottom: 1rem; }
-.meta-chip { background: var(--tag-bg); padding: 4px 10px; border-radius: 20px; color: var(--accent); font-weight: 500; }
-.detail-section { margin-top: 1rem; }
-.detail-section h3 { font-size: 12px; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 7px; border-bottom: 1px solid var(--border); padding-bottom: 4px; }
-.detail-text { font-size: 14px; line-height: 1.9; white-space: pre-wrap; }
-.action-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 1.25rem; }
-.btn-edit { border: 1.5px solid var(--accent); background: transparent; border-radius: 10px; padding: 11px; font-size: 14px; font-family: 'Vazirmatn', sans-serif; color: var(--accent); cursor: pointer; font-weight: 500; }
-.btn-fav-toggle { border: 1.5px solid var(--fav); background: transparent; border-radius: 10px; padding: 11px; font-size: 14px; font-family: 'Vazirmatn', sans-serif; color: var(--fav); cursor: pointer; font-weight: 500; }
-.btn-fav-toggle.active { background: var(--fav); color: #FFF; }
-.btn-delete { border: 1.5px solid var(--border); background: transparent; border-radius: 10px; padding: 11px; font-size: 14px; font-family: 'Vazirmatn', sans-serif; color: var(--muted); cursor: pointer; }
-.btn-close-detail { background: var(--accent); border: none; border-radius: 10px; padding: 12px; font-size: 15px; font-family: 'Vazirmatn', sans-serif; color: #FFF; cursor: pointer; font-weight: 700; margin-top: 10px; width: 100%; }
-
-.cat-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 1rem; }
-.cat-item { display: flex; align-items: center; justify-content: space-between; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; font-size: 14px; }
-.cat-del-btn { background: none; border: none; color: var(--muted); font-size: 18px; cursor: pointer; padding: 0 4px; }
-.cat-del-btn:hover { color: var(--fav); }
-.cat-edit-btn { background: none; border: none; color: var(--muted); font-size: 15px; cursor: pointer; padding: 0 4px; }
-.cat-edit-btn:hover { color: var(--accent); }
-.cat-add-row { display: flex; gap: 8px; }
-.cat-add-row input { flex: 1; }
-.cat-add-btn { background: var(--accent); color: #FFF; border: none; border-radius: 10px; padding: 10px 16px; font-size: 14px; font-family: 'Vazirmatn', sans-serif; cursor: pointer; font-weight: 700; white-space: nowrap; }
-
-.btn-login { background: #FFF; color: var(--accent); border: none; border-radius: 8px; padding: 6px 12px; font-size: 13px; font-family: 'Vazirmatn', sans-serif; cursor: pointer; font-weight: 700; white-space: nowrap; }
-.btn-logout { background: rgba(255,255,255,0.15); color: #FFF; border: 1px solid rgba(255,255,255,0.3); border-radius: 8px; padding: 5px 10px; font-size: 12px; font-family: 'Vazirmatn', sans-serif; cursor: pointer; display: flex; align-items: center; gap: 5px; }
-.user-avatar { width: 24px; height: 24px; border-radius: 50%; object-fit: cover; }
-
-.install-banner { background: #FFF3E0; border: 1px solid #FFCC80; border-radius: 12px; padding: 10px 14px; margin: 10px 1rem 0; display: flex; align-items: center; gap: 10px; font-size: 13px; color: #5D4037; }
-.install-banner button { margin-right: auto; background: var(--accent); color: #FFF; border: none; border-radius: 8px; padding: 6px 12px; font-size: 12px; font-family: 'Vazirmatn', sans-serif; cursor: pointer; white-space: nowrap; }
-.install-banner .close-banner { background: none; border: none; color: var(--muted); font-size: 18px; cursor: pointer; padding: 0; margin-right: 0; }
-
-/* AUTH */
-.btn-login { background: #FFF; color: var(--accent); border: none; border-radius: 8px; padding: 6px 12px; font-size: 13px; font-family: 'Vazirmatn', sans-serif; cursor: pointer; font-weight: 700; display: flex; align-items: center; gap: 5px; white-space: nowrap; }
-.btn-logout { background: rgba(255,255,255,0.15); color: #FFF; border: 1px solid rgba(255,255,255,0.3); border-radius: 8px; padding: 5px 10px; font-size: 12px; font-family: 'Vazirmatn', sans-serif; cursor: pointer; display: flex; align-items: center; gap: 5px; }
-.user-avatar { width: 24px; height: 24px; border-radius: 50%; object-fit: cover; }
-.fab.hidden { display: none; }
-
-@media(min-width:600px) { .grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); } }
-
-/* PDF PRINT STYLES */
-#pdf-frame { display: none; }
-@media print {
-  body > *:not(#pdf-frame) { display: none !important; }
-  #pdf-frame { display: block !important; }
-  @page { margin: 1.5cm 2cm; size: A4; }
-
-  .pdf-page { font-family: 'Vazirmatn', sans-serif; color: #2C1810; direction: rtl; }
-  .pdf-header { background: #C0622F; color: #FFF; padding: 1.5rem 2rem; border-radius: 12px; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 16px; }
-  .pdf-header-emoji { font-size: 52px; line-height: 1; }
-  .pdf-header-info h1 { font-size: 26px; font-weight: 700; margin-bottom: 6px; }
-  .pdf-chips { display: flex; gap: 8px; flex-wrap: wrap; }
-  .pdf-chip { background: rgba(255,255,255,0.25); padding: 3px 12px; border-radius: 20px; font-size: 13px; }
-  .pdf-fav { font-size: 13px; margin-top: 4px; }
-  .pdf-section { margin-bottom: 1.25rem; border: 1px solid #E8D5C4; border-radius: 10px; overflow: hidden; }
-  .pdf-section-title { background: #F5EAE0; color: #C0622F; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; padding: 8px 14px; border-bottom: 1px solid #E8D5C4; }
-  .pdf-section-body { padding: 14px; font-size: 14px; line-height: 2; white-space: pre-wrap; color: #2C1810; }
-  .pdf-footer { margin-top: 2rem; text-align: center; font-size: 11px; color: #8B6E5A; border-top: 1px solid #E8D5C4; padding-top: 10px; }
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Vazirmatn',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overscroll-behavior:none}
+.app-header{background:var(--accent);padding:1rem 1rem .75rem;position:sticky;top:0;z-index:50;box-shadow:0 2px 10px rgba(192,98,47,.3)}
+.header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem}
+.app-title{color:#FFF;font-size:19px;font-weight:700}
+.hdr-right{display:flex;align-items:center;gap:8px}
+.count-badge{background:rgba(255,255,255,.2);color:#FFF;font-size:12px;padding:3px 10px;border-radius:20px}
+.sync-dot{width:8px;height:8px;border-radius:50%;background:#4CAF50;display:inline-block}
+.sync-dot.syncing{background:#FFC107;animation:pulse 1s infinite}
+.sync-dot.error{background:#F44336}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.search-wrap{position:relative}
+.search-wrap input{width:100%;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:10px;padding:9px 36px 9px 12px;font-size:14px;color:#FFF;font-family:'Vazirmatn',sans-serif;outline:none}
+.search-wrap input::placeholder{color:rgba(255,255,255,.6)}
+.search-icon{position:absolute;right:11px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,.7)}
+.btn-login{background:#FFF;color:var(--accent);border:none;border-radius:8px;padding:6px 12px;font-size:13px;font-family:'Vazirmatn',sans-serif;cursor:pointer;font-weight:700;white-space:nowrap}
+.btn-logout{background:rgba(255,255,255,.15);color:#FFF;border:1px solid rgba(255,255,255,.3);border-radius:8px;padding:5px 10px;font-size:12px;font-family:'Vazirmatn',sans-serif;cursor:pointer;display:flex;align-items:center;gap:5px}
+.user-avatar{width:22px;height:22px;border-radius:50%;object-fit:cover}
+.filters-wrap{background:var(--card);border-bottom:1px solid var(--border);padding:.6rem 1rem;display:flex;align-items:center;gap:6px;overflow-x:auto;scrollbar-width:none}
+.filters-wrap::-webkit-scrollbar{display:none}
+.filter-btn{white-space:nowrap;padding:5px 13px;border-radius:20px;border:1.5px solid var(--border);background:transparent;color:var(--muted);font-size:13px;font-family:'Vazirmatn',sans-serif;cursor:pointer;font-weight:500;flex-shrink:0}
+.filter-btn.active{background:var(--accent);color:#FFF;border-color:var(--accent)}
+.filter-manage-btn{flex-shrink:0;width:32px;height:32px;border-radius:50%;border:1.5px dashed var(--border);background:transparent;color:var(--muted);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:12px;padding:1rem 1rem 7rem}
+.recipe-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1rem;cursor:pointer;box-shadow:var(--shadow);position:relative;transition:transform .12s}
+.recipe-card:active{transform:scale(.97)}
+.card-emoji{font-size:32px;margin-bottom:8px;display:block}
+.card-name{font-size:14px;font-weight:700;color:var(--text);margin-bottom:5px;line-height:1.4}
+.card-info{font-size:12px;color:var(--muted)}
+.card-tag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:20px;background:var(--tag-bg);color:var(--accent);font-weight:500;margin-top:8px}
+.fav-dot{position:absolute;top:9px;left:9px;font-size:14px;display:none}
+.fav-dot.show{display:block}
+.empty{grid-column:1/-1;text-align:center;padding:4rem 1rem;color:var(--muted)}
+.empty-emoji{font-size:48px;margin-bottom:12px}
+.loading-screen{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;gap:16px}
+.spinner{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-screen p{color:var(--muted);font-size:14px}
+.fab{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:var(--accent);color:#FFF;border:none;border-radius:50px;padding:13px 26px;font-size:16px;font-family:'Vazirmatn',sans-serif;font-weight:700;cursor:pointer;box-shadow:0 4px 20px rgba(192,98,47,.4);display:flex;align-items:center;gap:8px;z-index:100}
+.fab.hidden{display:none}
+.overlay{display:none;position:fixed;inset:0;background:rgba(44,24,16,.45);z-index:200;align-items:flex-end;justify-content:center}
+.overlay.open{display:flex}
+.sheet{background:var(--card);border-radius:20px 20px 0 0;width:100%;max-width:520px;max-height:92vh;overflow-y:auto;padding:1.25rem 1rem 2.5rem;animation:slideUp .22s ease}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.sheet-handle{width:36px;height:4px;background:var(--border);border-radius:4px;margin:0 auto 1.1rem}
+.sheet-title{font-size:17px;font-weight:700;margin-bottom:1.1rem}
+.form-group{margin-bottom:.9rem}
+.form-group label{display:block;font-size:13px;color:var(--muted);margin-bottom:4px;font-weight:500}
+.form-group input,.form-group select,.form-group textarea{width:100%;background:#FFF;border:1.5px solid var(--border);border-radius:10px;padding:10px 12px;font-size:14px;color:var(--text);font-family:'Vazirmatn',sans-serif;outline:none}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--accent2)}
+.form-group textarea{min-height:85px;resize:vertical}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.emoji-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:5px;margin-top:4px}
+.emoji-opt{font-size:20px;text-align:center;padding:5px;border-radius:8px;cursor:pointer;border:2px solid transparent}
+.emoji-opt.sel{border-color:var(--accent);background:var(--tag-bg)}
+.btn-row{display:grid;grid-template-columns:1fr 2fr;gap:10px;margin-top:1.1rem}
+.btn-cancel{background:var(--tag-bg);border:none;border-radius:10px;padding:12px;font-size:15px;font-family:'Vazirmatn',sans-serif;color:var(--muted);cursor:pointer;font-weight:500}
+.btn-save{background:var(--accent);border:none;border-radius:10px;padding:12px;font-size:15px;font-family:'Vazirmatn',sans-serif;color:#FFF;cursor:pointer;font-weight:700}
+.btn-save:disabled{opacity:.6}
+.detail-emoji{font-size:46px;text-align:center;margin-bottom:6px}
+.detail-title{font-size:21px;font-weight:700;text-align:center;margin-bottom:6px}
+.detail-meta{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;font-size:13px;margin-bottom:1rem}
+.meta-chip{background:var(--tag-bg);padding:4px 10px;border-radius:20px;color:var(--accent);font-weight:500}
+.detail-section{margin-top:1rem}
+.detail-section h3{font-size:12px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:1px;margin-bottom:7px;border-bottom:1px solid var(--border);padding-bottom:4px}
+.detail-text{font-size:14px;line-height:1.9;white-space:pre-wrap}
+.action-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:1.25rem}
+.btn-edit{border:1.5px solid var(--accent);background:transparent;border-radius:10px;padding:11px;font-size:14px;font-family:'Vazirmatn',sans-serif;color:var(--accent);cursor:pointer;font-weight:500}
+.btn-fav-toggle{border:1.5px solid var(--fav);background:transparent;border-radius:10px;padding:11px;font-size:14px;font-family:'Vazirmatn',sans-serif;color:var(--fav);cursor:pointer;font-weight:500}
+.btn-fav-toggle.active{background:var(--fav);color:#FFF}
+.btn-delete{border:1.5px solid var(--border);background:transparent;border-radius:10px;padding:11px;font-size:14px;font-family:'Vazirmatn',sans-serif;color:var(--muted);cursor:pointer}
+.btn-close-detail{background:var(--accent);border:none;border-radius:10px;padding:12px;font-size:15px;font-family:'Vazirmatn',sans-serif;color:#FFF;cursor:pointer;font-weight:700;margin-top:10px;width:100%}
+.cat-list{display:flex;flex-direction:column;gap:8px;margin-bottom:1rem}
+.cat-item{display:flex;align-items:center;justify-content:space-between;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-size:14px}
+.cat-del-btn{background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;padding:0 4px}
+.cat-edit-btn{background:none;border:none;color:var(--muted);font-size:15px;cursor:pointer;padding:0 4px}
+.cat-add-row{display:flex;gap:8px}
+.cat-add-row input{flex:1}
+.cat-add-btn{background:var(--accent);color:#FFF;border:none;border-radius:10px;padding:10px 16px;font-size:14px;font-family:'Vazirmatn',sans-serif;cursor:pointer;font-weight:700;white-space:nowrap}
+.install-banner{background:#FFF3E0;border:1px solid #FFCC80;border-radius:12px;padding:10px 14px;margin:10px 1rem 0;display:flex;align-items:center;gap:10px;font-size:13px;color:#5D4037}
+.install-banner button{margin-right:auto;background:var(--accent);color:#FFF;border:none;border-radius:8px;padding:6px 12px;font-size:12px;font-family:'Vazirmatn',sans-serif;cursor:pointer;white-space:nowrap}
+.install-banner .close-banner{background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;padding:0;margin-right:0}
+@media(min-width:600px){.grid{grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}}
+#pdf-frame{display:none}
+@media print{
+  body>*:not(#pdf-frame){display:none!important}
+  #pdf-frame{display:block!important}
+  @page{margin:1.5cm 2cm;size:A4}
+  .pdf-page{font-family:'Vazirmatn',sans-serif;color:#2C1810;direction:rtl}
+  .pdf-header{background:#C0622F;color:#FFF;padding:1.5rem 2rem;border-radius:12px;margin-bottom:1.5rem;display:flex;align-items:center;gap:16px}
+  .pdf-header-emoji{font-size:52px;line-height:1}
+  .pdf-header-info h1{font-size:26px;font-weight:700;margin-bottom:6px}
+  .pdf-chips{display:flex;gap:8px;flex-wrap:wrap}
+  .pdf-chip{background:rgba(255,255,255,.25);padding:3px 12px;border-radius:20px;font-size:13px}
+  .pdf-fav{font-size:13px;margin-top:4px}
+  .pdf-section{margin-bottom:1.25rem;border:1px solid #E8D5C4;border-radius:10px;overflow:hidden}
+  .pdf-section-title{background:#F5EAE0;color:#C0622F;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;padding:8px 14px;border-bottom:1px solid #E8D5C4}
+  .pdf-section-body{padding:14px;font-size:14px;line-height:2;white-space:pre-wrap;color:#2C1810}
+  .pdf-footer{margin-top:2rem;text-align:center;font-size:11px;color:#8B6E5A;border-top:1px solid #E8D5C4;padding-top:10px}
 }
 </style>
 </head>
@@ -155,11 +131,11 @@ body { font-family: 'Vazirmatn', sans-serif; background: var(--bg); color: var(-
 
 <header class="app-header">
   <div class="header-top">
-    <div class="app-title">🍳 آشپزخانه ما</div>
-    <div style="display:flex;align-items:center;gap:8px">
-      <span id="sync-indicator" title="وضعیت اتصال"><span class="sync-dot syncing"></span></span>
+    <div class="app-title">🍳 آشپزخانه من</div>
+    <div class="hdr-right">
+      <span id="sync-dot" class="sync-dot syncing" title="وضعیت اتصال"></span>
       <span class="count-badge" id="count-badge">۰ دستور</span>
-      <div id="auth-btn-wrap"></div>
+      <div id="auth-wrap"></div>
     </div>
   </div>
   <div class="search-wrap">
@@ -171,10 +147,11 @@ body { font-family: 'Vazirmatn', sans-serif; background: var(--bg); color: var(-
 <div id="install-banner-wrap"></div>
 <div class="filters-wrap" id="filters-wrap"></div>
 <div class="grid" id="grid"></div>
-<button class="fab hidden" id="fab-btn" onclick="openAdd()">＋ دستور جدید</button>
+
+<button class="fab hidden" id="fab" onclick="openAdd()">＋ دستور جدید</button>
 
 <!-- ADD/EDIT MODAL -->
-<div class="overlay" id="add-overlay" onclick="overlayClick(event,'add-overlay',closeAdd)">
+<div class="overlay" id="add-overlay">
   <div class="sheet">
     <div class="sheet-handle"></div>
     <div class="sheet-title" id="add-title">📝 دستور آشپزی جدید</div>
@@ -184,154 +161,134 @@ body { font-family: 'Vazirmatn', sans-serif; background: var(--bg); color: var(-
       <div class="form-group"><label>دسته‌بندی</label><select id="f-cat"></select></div>
       <div class="form-group"><label>سختی</label><select id="f-diff"><option>آسان</option><option>متوسط</option><option>پیشرفته</option></select></div>
     </div>
-    <div class="form-group"><label>زمان پخت (دقیقه)</label><input type="number" id="f-time" placeholder="مثلاً: ۶۰" min="1"></div>
+    <div class="form-group"><label>زمان پخت (دقیقه)</label><input type="number" id="f-time" placeholder="60" min="1"></div>
     <div class="form-group"><label>مواد لازم</label><textarea id="f-ing" placeholder="هر ماده در یک خط..."></textarea></div>
     <div class="form-group"><label>طرز تهیه</label><textarea id="f-steps" placeholder="مراحل پخت..."></textarea></div>
     <div class="btn-row">
       <button class="btn-cancel" onclick="closeAdd()">انصراف</button>
-      <button class="btn-save" id="save-btn" onclick="saveRecipe()">💾 ذخیره کن</button>
+      <button class="btn-save" id="save-btn" onclick="doSaveRecipe()">💾 ذخیره کن</button>
     </div>
   </div>
 </div>
 
 <!-- DETAIL MODAL -->
-<div class="overlay" id="detail-overlay" onclick="overlayClick(event,'detail-overlay',closeDetail)">
+<div class="overlay" id="detail-overlay">
   <div class="sheet" id="detail-sheet"></div>
 </div>
 
 <!-- CATEGORY MANAGER -->
-<div class="overlay" id="cat-overlay" onclick="overlayClick(event,'cat-overlay',closeCatManager)">
+<div class="overlay" id="cat-overlay">
   <div class="sheet">
     <div class="sheet-handle"></div>
     <div class="sheet-title">🗂 مدیریت دسته‌بندی‌ها</div>
     <div class="cat-list" id="cat-list"></div>
     <div class="cat-add-row">
-      <input type="text" id="new-cat-input" placeholder="نام دسته‌بندی جدید..." onkeydown="if(event.key==='Enter')addCategory()">
-      <button class="cat-add-btn" onclick="addCategory()">+ اضافه</button>
+      <input type="text" id="new-cat-input" placeholder="نام دسته‌بندی جدید...">
+      <button class="cat-add-btn" onclick="doAddCategory()">+ اضافه</button>
     </div>
     <div class="btn-row" style="margin-top:1rem"><div></div><button class="btn-save" onclick="closeCatManager()">✓ تمام</button></div>
   </div>
 </div>
 
-<!-- Firebase SDKs -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getFirestore, collection, doc, addDoc, updateDoc, deleteDoc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyC2A9GrlvDQ9IZR2dRwomOrIzhGTeV2f9U",
-  authDomain: "cookingma-5274e.firebaseapp.com",
-  projectId: "cookingma-5274e",
-  storageBucket: "cookingma-5274e.firebasestorage.app",
-  messagingSenderId: "427944964341",
-  appId: "1:427944964341:web:4153b67f69451b3c1395bc"
-};
+const fb = initializeApp({
+  apiKey:"AIzaSyC2A9GrlvDQ9IZR2dRwomOrIzhGTeV2f9U",
+  authDomain:"cookingma-5274e.firebaseapp.com",
+  projectId:"cookingma-5274e",
+  storageBucket:"cookingma-5274e.firebasestorage.app",
+  messagingSenderId:"427944964341",
+  appId:"1:427944964341:web:4153b67f69451b3c1395bc"
+});
+const db = getFirestore(fb);
+const auth = getAuth(fb);
+const gProvider = new GoogleAuthProvider();
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const auth = getAuth(app);
-const provider = new GoogleAuthProvider();
+const EMOJIS = ['🍲','🍝','🍛','🥗','🍜','🫕','🥘','🍱','🥙','🫔','🍖','🥩','🐟','🍣','🥞','🧆','🍰','🎂','🧁','🍩','☕','🫖','🍕','🧇','🥐','🫙','🍯'];
+const toF = n => String(n).replace(/\d/g, d=>'۰۱۲۳۴۵۶۷۸۹'[d]);
 
-const EMOJIS = ['🍲','🍝','🍛','🥗','🍜','🫕','🥘','🍱','🥙','🫔','🍖','🥩','🐟','🍣','🥞','🧆','🍰','🎂','🧁','🍩','☕','🫖','🍕','🥗','🧇','🥐','🫙','🍯'];
-let recipes = [], categories = [], activeFilter = 'همه', selEmoji = EMOJIS[0], editingId = null, deferredPrompt = null;
-let currentUser = null;
-function toF(n) { return String(n).replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]); }
+let recipes=[], categories=[], activeFilter='همه', selEmoji=EMOJIS[0], editingId=null, currentUser=null, deferredPrompt=null;
 
-/* AUTH */
-function renderAuthBtn() {
-  const wrap = document.getElementById('auth-btn-wrap');
-  if (!wrap) return;
-  if (currentUser) {
-    wrap.innerHTML = `<button class="btn-logout" onclick="window._signOut()">
-      ${currentUser.photoURL ? `<img src="${currentUser.photoURL}" class="user-avatar">` : '👤'}
-      خروج
-    </button>`;
-  } else {
-    wrap.innerHTML = `<button class="btn-login" onclick="window._signIn()">🔑 ورود</button>`;
-  }
+// ── SYNC STATUS ─────────────────────────────────────────────
+function setSyncStatus(s) {
+  const d = document.getElementById('sync-dot');
+  if(d) d.className = 'sync-dot'+(s==='ok'?'':s==='syncing'?' syncing':' error');
 }
 
-window._signIn = async function() {
-  try { await signInWithPopup(auth, provider); }
-  catch(e) { alert('خطا در ورود: ' + e.message); }
-};
-window._signOut = async function() {
-  if (confirm('از حساب خارج شوید؟')) await signOut(auth);
-};
-
+// ── AUTH ─────────────────────────────────────────────────────
 onAuthStateChanged(auth, user => {
   currentUser = user;
-  renderAuthBtn();
-  const fab = document.getElementById('fab-btn');
-  if (fab) {
-    if (user) { fab.classList.remove('hidden'); }
-    else { fab.classList.add('hidden'); }
+  // render login/logout button
+  const wrap = document.getElementById('auth-wrap');
+  if(user) {
+    wrap.innerHTML = `<button class="btn-logout" id="logout-btn">
+      ${user.photoURL?`<img src="${user.photoURL}" class="user-avatar">`:'👤'} خروج
+    </button>`;
+    document.getElementById('logout-btn').onclick = () => { if(confirm('از حساب خارج شوید؟')) signOut(auth); };
+    document.getElementById('fab').classList.remove('hidden');
+  } else {
+    wrap.innerHTML = `<button class="btn-login" id="login-btn">🔑 ورود</button>`;
+    document.getElementById('login-btn').onclick = () => signInWithPopup(auth, gProvider).catch(e=>alert('خطا: '+e.message));
+    document.getElementById('fab').classList.add('hidden');
   }
   renderAll();
 });
 
-function setSyncStatus(status) {
-  const dot = document.querySelector('#sync-indicator .sync-dot');
-  dot.className = 'sync-dot' + (status === 'ok' ? '' : status === 'syncing' ? ' syncing' : ' error');
-  dot.title = status === 'ok' ? 'متصل به Firebase' : status === 'syncing' ? 'در حال همگام‌سازی...' : 'خطا در اتصال';
-}
-
-// Listen to recipes in real time
-onSnapshot(collection(db, 'recipes'), snap => {
-  recipes = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-  recipes.sort((a,b) => (b.createdAt||0) - (a.createdAt||0));
-  document.getElementById('loading-screen').style.display = 'none';
+// ── FIRESTORE LISTENERS ──────────────────────────────────────
+onSnapshot(collection(db,'recipes'), snap => {
+  recipes = snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+  document.getElementById('loading-screen').style.display='none';
   setSyncStatus('ok');
   renderAll();
-}, err => { setSyncStatus('error'); document.getElementById('loading-screen').style.display = 'none'; });
+}, ()=>{ setSyncStatus('error'); document.getElementById('loading-screen').style.display='none'; });
 
-// Listen to categories in real time
-onSnapshot(doc(db, 'config', 'categories'), snap => {
-  if (snap.exists()) categories = snap.data().list || [];
-  else categories = ['ایرانی','ایتالیایی','سالاد','سوپ','دسر','سریع','سایر'];
+onSnapshot(doc(db,'config','categories'), snap => {
+  categories = snap.exists() ? (snap.data().list||[]) : ['ایرانی','ایتالیایی','سالاد','سوپ','دسر','سریع','سایر'];
   renderAll();
 });
 
-async function saveCategoriesToDB() {
-  await setDoc(doc(db, 'config', 'categories'), { list: categories });
-}
+async function saveCats() { await setDoc(doc(db,'config','categories'),{list:categories}); }
 
+// ── RENDER ───────────────────────────────────────────────────
 function renderAll() { renderFilters(); renderGrid(); }
 
 function renderFilters() {
-  const all = ['همه', 'مورد علاقه', ...categories];
   const wrap = document.getElementById('filters-wrap');
   wrap.innerHTML = '';
-  if (currentUser) {
-    const manBtn = document.createElement('button');
-    manBtn.className = 'filter-manage-btn'; manBtn.title = 'مدیریت دسته‌بندی‌ها'; manBtn.textContent = '⚙';
-    manBtn.onclick = () => window._openCatManager();
-    wrap.appendChild(manBtn);
+  if(currentUser) {
+    const gear = document.createElement('button');
+    gear.className='filter-manage-btn'; gear.textContent='⚙'; gear.title='مدیریت دسته‌بندی‌ها';
+    gear.onclick = openCatManager;
+    wrap.appendChild(gear);
   }
-  all.forEach(c => {
-    const b = document.createElement('button');
-    b.className = 'filter-btn' + (c === activeFilter ? ' active' : '');
-    b.textContent = (c === 'مورد علاقه' ? '❤️ ' : '') + c;
-    b.onclick = () => { activeFilter = c; renderAll(); };
+  ['همه','مورد علاقه',...categories].forEach(c=>{
+    const b=document.createElement('button');
+    b.className='filter-btn'+(c===activeFilter?' active':'');
+    b.textContent=(c==='مورد علاقه'?'❤️ ':'')+c;
+    b.onclick=()=>{ activeFilter=c; renderAll(); };
     wrap.appendChild(b);
   });
-  document.getElementById('count-badge').textContent = toF(recipes.length) + ' دستور';
+  document.getElementById('count-badge').textContent=toF(recipes.length)+' دستور';
 }
 
 function renderGrid() {
-  const q = (document.getElementById('search').value || '').trim().toLowerCase();
-  let list = [...recipes];
-  if (activeFilter === 'مورد علاقه') list = list.filter(r => r.fav);
-  else if (activeFilter !== 'همه') list = list.filter(r => r.cat === activeFilter);
-  if (q) list = list.filter(r => r.name.toLowerCase().includes(q) || (r.cat||'').toLowerCase().includes(q));
-  const grid = document.getElementById('grid');
-  if (!list.length) {
-    grid.innerHTML = `<div class="empty"><div class="empty-emoji">${recipes.length ? '🔍' : '🍽️'}</div><p>${recipes.length ? 'دستوری پیدا نشد' : 'هنوز دستوری ندارید!'}<br><small style="font-size:13px;color:var(--muted)">روی + بزنید و اولین دستور را اضافه کنید</small></p></div>`;
+  const q=(document.getElementById('search').value||'').trim().toLowerCase();
+  let list=[...recipes];
+  if(activeFilter==='مورد علاقه') list=list.filter(r=>r.fav);
+  else if(activeFilter!=='همه') list=list.filter(r=>r.cat===activeFilter);
+  if(q) list=list.filter(r=>r.name.toLowerCase().includes(q)||(r.cat||'').toLowerCase().includes(q));
+  const grid=document.getElementById('grid');
+  if(!list.length){
+    grid.innerHTML=`<div class="empty"><div class="empty-emoji">${recipes.length?'🔍':'🍽️'}</div>
+      <p>${recipes.length?'دستوری پیدا نشد':'هنوز دستوری ندارید!'}<br>
+      <small style="font-size:13px;color:var(--muted)">${currentUser?'روی + بزنید':'برای افزودن وارد شوید'}</small></p></div>`;
     return;
   }
-  grid.innerHTML = list.map(r => `
-    <div class="recipe-card" onclick="window._openDetail('${r.id}')">
+  grid.innerHTML=list.map(r=>`
+    <div class="recipe-card" onclick="openDetail('${r.id}')">
       <span class="fav-dot${r.fav?' show':''}">❤️</span>
       <span class="card-emoji">${r.emoji||'🍽️'}</span>
       <div class="card-name">${r.name}</div>
@@ -340,72 +297,75 @@ function renderGrid() {
     </div>`).join('');
 }
 
+// ── EMOJI GRID ───────────────────────────────────────────────
 function buildEmojiGrid() {
-  document.getElementById('emoji-grid').innerHTML = EMOJIS.map(e =>
-    `<div class="emoji-opt${e===selEmoji?' sel':''}" onclick="window._pickEmoji('${e}')">${e}</div>`).join('');
+  document.getElementById('emoji-grid').innerHTML=EMOJIS.map(e=>
+    `<div class="emoji-opt${e===selEmoji?' sel':''}" onclick="pickEmoji('${e}')">${e}</div>`).join('');
 }
-window._pickEmoji = e => { selEmoji = e; buildEmojiGrid(); };
+window.pickEmoji = e => { selEmoji=e; buildEmojiGrid(); };
 
 function fillCatSelect() {
-  document.getElementById('f-cat').innerHTML = categories.map(c => `<option>${c}</option>`).join('');
+  document.getElementById('f-cat').innerHTML=categories.map(c=>`<option>${c}</option>`).join('');
 }
 
-window._openAdd = function() {
-  if (!currentUser) { alert('برای افزودن دستور، ابتدا وارد شوید'); window._signIn(); return; }
-  editingId = null;
-  document.getElementById('f-name').value = '';
-  document.getElementById('f-time').value = '';
-  document.getElementById('f-ing').value = '';
-  document.getElementById('f-steps').value = '';
-  selEmoji = EMOJIS[0]; buildEmojiGrid(); fillCatSelect();
-  document.getElementById('add-title').textContent = '📝 دستور آشپزی جدید';
-  document.getElementById('save-btn').textContent = '💾 ذخیره کن';
+// ── ADD / EDIT ───────────────────────────────────────────────
+window.openAdd = function() {
+  editingId=null;
+  document.getElementById('f-name').value='';
+  document.getElementById('f-time').value='';
+  document.getElementById('f-ing').value='';
+  document.getElementById('f-steps').value='';
+  document.getElementById('f-diff').selectedIndex=0;
+  selEmoji=EMOJIS[0]; buildEmojiGrid(); fillCatSelect();
+  document.getElementById('add-title').textContent='📝 دستور آشپزی جدید';
+  document.getElementById('save-btn').textContent='💾 ذخیره کن';
   document.getElementById('add-overlay').classList.add('open');
 };
 
-window._openEdit = function(id) {
-  if (!currentUser) return;
-  const r = recipes.find(x => x.id===id); if (!r) return;
-  editingId = id;
-  fillCatSelect();
-  document.getElementById('f-name').value = r.name||'';
-  document.getElementById('f-time').value = r.time||'';
-  document.getElementById('f-ing').value = r.ing||'';
-  document.getElementById('f-steps').value = r.steps||'';
-  document.getElementById('f-diff').value = r.diff||'آسان';
-  document.getElementById('f-cat').value = r.cat||categories[0];
-  selEmoji = r.emoji||EMOJIS[0]; buildEmojiGrid();
-  document.getElementById('add-title').textContent = '✏️ ویرایش دستور';
-  document.getElementById('save-btn').textContent = '💾 ذخیره تغییرات';
+window.openEdit = function(id) {
+  const r=recipes.find(x=>x.id===id); if(!r) return;
+  editingId=id; fillCatSelect();
+  document.getElementById('f-name').value=r.name||'';
+  document.getElementById('f-time').value=r.time||'';
+  document.getElementById('f-ing').value=r.ing||'';
+  document.getElementById('f-steps').value=r.steps||'';
+  document.getElementById('f-diff').value=r.diff||'آسان';
+  document.getElementById('f-cat').value=r.cat||categories[0];
+  selEmoji=r.emoji||EMOJIS[0]; buildEmojiGrid();
+  document.getElementById('add-title').textContent='✏️ ویرایش دستور';
+  document.getElementById('save-btn').textContent='💾 ذخیره تغییرات';
   closeDetail();
   document.getElementById('add-overlay').classList.add('open');
 };
 
-window._saveRecipe = async function() {
-  const name = document.getElementById('f-name').value.trim();
-  if (!name) { alert('لطفاً نام غذا را وارد کنید'); return; }
-  const btn = document.getElementById('save-btn');
-  btn.disabled = true; btn.textContent = '⏳ در حال ذخیره...';
-  setSyncStatus('syncing');
-  const data = { name, cat: document.getElementById('f-cat').value, emoji: selEmoji, time: parseInt(document.getElementById('f-time').value)||0, diff: document.getElementById('f-diff').value, ing: document.getElementById('f-ing').value.trim(), steps: document.getElementById('f-steps').value.trim() };
+window.closeAdd = function() { document.getElementById('add-overlay').classList.remove('open'); };
+
+window.doSaveRecipe = async function() {
+  const name=document.getElementById('f-name').value.trim();
+  if(!name){ alert('لطفاً نام غذا را وارد کنید'); return; }
+  const btn=document.getElementById('save-btn');
+  btn.disabled=true; btn.textContent='⏳ در حال ذخیره...'; setSyncStatus('syncing');
+  const data={ name, cat:document.getElementById('f-cat').value, emoji:selEmoji,
+    time:parseInt(document.getElementById('f-time').value)||0,
+    diff:document.getElementById('f-diff').value,
+    ing:document.getElementById('f-ing').value.trim(),
+    steps:document.getElementById('f-steps').value.trim() };
   try {
-    if (editingId) {
-      await updateDoc(doc(db, 'recipes', editingId), data);
-    } else {
-      await addDoc(collection(db, 'recipes'), { ...data, fav: false, createdAt: Date.now() });
-    }
+    if(editingId) await updateDoc(doc(db,'recipes',editingId),data);
+    else await addDoc(collection(db,'recipes'),{...data,fav:false,createdAt:Date.now()});
     closeAdd();
-  } catch(e) { alert('خطا در ذخیره: ' + e.message); }
-  btn.disabled = false;
+  } catch(e){ alert('خطا: '+e.message); }
+  btn.disabled=false; btn.textContent=editingId?'💾 ذخیره تغییرات':'💾 ذخیره کن';
 };
 
-window._openDetail = function(id) {
-  const r = recipes.find(x => x.id===id); if (!r) return;
+// ── DETAIL ───────────────────────────────────────────────────
+window.openDetail = function(id) {
+  const r=recipes.find(x=>x.id===id); if(!r) return;
   const ownerBtns = currentUser ? `
     <div class="action-row">
-      <button class="btn-fav-toggle${r.fav?' active':''}" onclick="window._toggleFav('${r.id}')">${r.fav?'❤️ علاقه‌مندی':'🤍 علاقه‌مندی'}</button>
-      <button class="btn-edit" onclick="window._openEdit('${r.id}')">✏️ ویرایش</button>
-      <button class="btn-delete" onclick="window._deleteRecipe('${r.id}')">🗑 حذف</button>
+      <button class="btn-fav-toggle${r.fav?' active':''}" onclick="toggleFav('${r.id}')">${r.fav?'❤️ علاقه‌مندی':'🤍 علاقه‌مندی'}</button>
+      <button class="btn-edit" onclick="openEdit('${r.id}')">✏️ ویرایش</button>
+      <button class="btn-delete" onclick="deleteRecipe('${r.id}')">🗑 حذف</button>
     </div>` : '';
   document.getElementById('detail-sheet').innerHTML=`
     <div class="sheet-handle"></div>
@@ -413,23 +373,150 @@ window._openDetail = function(id) {
     <div class="detail-title">${r.name}</div>
     <div class="detail-meta">
       ${r.time?`<span class="meta-chip">⏱ ${toF(r.time)} دقیقه</span>`:''}
-      <span class="meta-chip">${r.diff||''}</span>
-      <span class="meta-chip">${r.cat||''}</span>
+      ${r.diff?`<span class="meta-chip">${r.diff}</span>`:''}
+      ${r.cat?`<span class="meta-chip">${r.cat}</span>`:''}
     </div>
     ${r.ing?`<div class="detail-section"><h3>مواد لازم</h3><div class="detail-text">${r.ing}</div></div>`:''}
     ${r.steps?`<div class="detail-section"><h3>طرز تهیه</h3><div class="detail-text">${r.steps}</div></div>`:''}
     ${ownerBtns}
-    <button class="btn-save" style="width:100%;margin-top:10px;border-radius:10px" onclick="window._downloadPDF('${r.id}')">📄 دانلود PDF</button>
+    <button class="btn-save" style="width:100%;margin-top:10px;border-radius:10px" onclick="downloadPDF('${r.id}')">📄 دانلود PDF</button>
     <button class="btn-close-detail" onclick="closeDetail()">بستن</button>`;
   document.getElementById('detail-overlay').classList.add('open');
 };
 
-function closeDetail() { document.getElementById('detail-overlay').classList.remove('open'); }
-function openCatManager() { window._openCatManager && window._openCatManager(); }
-function closeCatManager() { document.getElementById('cat-overlay').classList.remove('open'); }
-function addCategory() { window._addCategory && window._addCategory(); }
-function saveRecipe() { window._saveRecipe && window._saveRecipe(); }
-function overlayClick(e, id, fn) { if(e.target===document.getElementById(id)) fn(); }
+window.closeDetail = function() { document.getElementById('detail-overlay').classList.remove('open'); };
+
+window.toggleFav = async function(id) {
+  const r=recipes.find(x=>x.id===id); if(!r) return;
+  setSyncStatus('syncing');
+  await updateDoc(doc(db,'recipes',id),{fav:!r.fav});
+  openDetail(id);
+};
+
+window.deleteRecipe = async function(id) {
+  if(!confirm('این دستور حذف شود؟')) return;
+  setSyncStatus('syncing');
+  await deleteDoc(doc(db,'recipes',id));
+  closeDetail();
+};
+
+// ── CATEGORY MANAGER ─────────────────────────────────────────
+window.openCatManager = function() {
+  renderCatList();
+  document.getElementById('new-cat-input').value='';
+  document.getElementById('cat-overlay').classList.add('open');
+};
+
+window.closeCatManager = function() {
+  document.getElementById('cat-overlay').classList.remove('open');
+  renderAll();
+};
+
+function renderCatList() {
+  document.getElementById('cat-list').innerHTML=categories.map((c,i)=>`
+    <div class="cat-item" id="ci-${i}">
+      <span>${c}</span>
+      <div style="display:flex;gap:4px">
+        <button class="cat-edit-btn" onclick="startEditCat(${i})">✏️</button>
+        <button class="cat-del-btn" onclick="deleteCat(${i})">✕</button>
+      </div>
+    </div>`).join('')||'<p style="color:var(--muted);font-size:13px;text-align:center">هنوز دسته‌بندی ندارید</p>';
+}
+
+window.startEditCat = function(i) {
+  const item=document.getElementById('ci-'+i);
+  const old=categories[i];
+  item.innerHTML=`
+    <input id="ce-${i}" type="text" value="${old}" style="flex:1;font-family:Vazirmatn,sans-serif;font-size:14px;padding:6px 10px;border:1.5px solid var(--accent2);border-radius:8px;outline:none;color:var(--text)">
+    <div style="display:flex;gap:6px;margin-right:6px">
+      <button class="cat-add-btn" style="padding:6px 12px;font-size:13px" onclick="saveEditCat(${i})">✓</button>
+      <button class="cat-del-btn" onclick="renderCatList()">✕</button>
+    </div>`;
+  item.style.gap='8px';
+  const inp=document.getElementById('ce-'+i);
+  inp.focus();
+  inp.onkeydown=e=>{ if(e.key==='Enter') saveEditCat(i); if(e.key==='Escape') renderCatList(); };
+};
+
+window.saveEditCat = async function(i) {
+  const v=(document.getElementById('ce-'+i).value||'').trim();
+  if(!v) return;
+  if(categories.includes(v)&&v!==categories[i]){ alert('این نام قبلاً وجود دارد'); return; }
+  const old=categories[i];
+  categories[i]=v;
+  await Promise.all(recipes.filter(r=>r.cat===old).map(r=>updateDoc(doc(db,'recipes',r.id),{cat:v})));
+  if(activeFilter===old) activeFilter=v;
+  await saveCats(); renderCatList();
+};
+
+window.doAddCategory = async function() {
+  const inp=document.getElementById('new-cat-input');
+  const v=inp.value.trim(); if(!v) return;
+  if(categories.includes(v)){ alert('این دسته‌بندی قبلاً وجود دارد'); return; }
+  categories.push(v);
+  await saveCats(); inp.value=''; renderCatList();
+};
+
+window.deleteCat = async function(i) {
+  const cat=categories[i];
+  const cnt=recipes.filter(r=>r.cat===cat).length;
+  if(cnt&&!confirm(`دسته‌بندی "${cat}" در ${toF(cnt)} دستور استفاده شده. حذف شود؟`)) return;
+  categories.splice(i,1);
+  await saveCats(); renderCatList();
+  if(activeFilter===cat) activeFilter='همه';
+};
+
+// ── PDF ──────────────────────────────────────────────────────
+window.downloadPDF = function(id) {
+  const r=recipes.find(x=>x.id===id); if(!r) return;
+  const now=new Date().toLocaleDateString('fa-IR');
+  document.getElementById('pdf-frame').innerHTML=`
+    <div class="pdf-page">
+      <div class="pdf-header">
+        <div class="pdf-header-emoji">${r.emoji||'🍽️'}</div>
+        <div class="pdf-header-info">
+          <h1>${r.name}</h1>
+          <div class="pdf-chips">
+            ${r.time?`<span class="pdf-chip">⏱ ${r.time} دقیقه</span>`:''}
+            ${r.diff?`<span class="pdf-chip">${r.diff}</span>`:''}
+            ${r.cat?`<span class="pdf-chip">${r.cat}</span>`:''}
+          </div>
+          ${r.fav?'<div class="pdf-fav">❤️ مورد علاقه</div>':''}
+        </div>
+      </div>
+      ${r.ing?`<div class="pdf-section"><div class="pdf-section-title">مواد لازم</div><div class="pdf-section-body">${r.ing}</div></div>`:''}
+      ${r.steps?`<div class="pdf-section"><div class="pdf-section-title">طرز تهیه</div><div class="pdf-section-body">${r.steps}</div></div>`:''}
+      <div class="pdf-footer">آشپزخانه من · ${now}</div>
+    </div>`;
+  setTimeout(()=>window.print(),150);
+};
+
+// ── PWA ──────────────────────────────────────────────────────
+if('serviceWorker' in navigator)
+  window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+
+window.addEventListener('beforeinstallprompt', e=>{
+  e.preventDefault(); deferredPrompt=e;
+  if(!localStorage.getItem('install-dismissed'))
+    document.getElementById('install-banner-wrap').innerHTML=`
+      <div class="install-banner">📲 این اپ را به صفحه اصلی گوشیت اضافه کن!
+        <button onclick="doInstall()">نصب</button>
+        <button class="close-banner" onclick="dismissBanner()">✕</button>
+      </div>`;
+});
+window.doInstall=()=>{ if(!deferredPrompt)return; deferredPrompt.prompt(); deferredPrompt.userChoice.then(()=>{ deferredPrompt=null; document.getElementById('install-banner-wrap').innerHTML=''; }); };
+window.dismissBanner=()=>{ localStorage.setItem('install-dismissed','1'); document.getElementById('install-banner-wrap').innerHTML=''; };
+
+// ── OVERLAY CLOSE ON BG CLICK ────────────────────────────────
+['add-overlay','detail-overlay','cat-overlay'].forEach(id=>{
+  document.getElementById(id).addEventListener('click', e=>{
+    if(e.target===document.getElementById(id)) document.getElementById(id).classList.remove('open');
+  });
+});
+
+// enter key for cat input
+document.getElementById('new-cat-input').addEventListener('keydown', e=>{ if(e.key==='Enter') doAddCategory(); });
+
 </script>
 </body>
 </html>
