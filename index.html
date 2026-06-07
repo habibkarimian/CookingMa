@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-title" content="آشپزخانه">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-192.png">
-<title>آشپزخانه ما</title>
+<title>آشپزخانه من</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700&display=swap" rel="stylesheet">
 <style>
@@ -58,6 +58,7 @@ body { font-family: 'Vazirmatn', sans-serif; background: var(--bg); color: var(-
 @keyframes spin { to { transform: rotate(360deg); } }
 .loading-screen p { color: var(--muted); font-size: 14px; }
 
+.fab.hidden { display: none; }
 .fab { position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%); background: var(--accent); color: #FFF; border: none; border-radius: 50px; padding: 13px 26px; font-size: 16px; font-family: 'Vazirmatn', sans-serif; font-weight: 700; cursor: pointer; box-shadow: 0 4px 20px rgba(192,98,47,0.4); display: flex; align-items: center; gap: 8px; z-index: 100; }
 
 .overlay { display: none; position: fixed; inset: 0; background: rgba(44,24,16,0.45); z-index: 200; align-items: flex-end; justify-content: center; }
@@ -105,9 +106,19 @@ body { font-family: 'Vazirmatn', sans-serif; background: var(--bg); color: var(-
 .cat-add-row input { flex: 1; }
 .cat-add-btn { background: var(--accent); color: #FFF; border: none; border-radius: 10px; padding: 10px 16px; font-size: 14px; font-family: 'Vazirmatn', sans-serif; cursor: pointer; font-weight: 700; white-space: nowrap; }
 
+.btn-login { background: #FFF; color: var(--accent); border: none; border-radius: 8px; padding: 6px 12px; font-size: 13px; font-family: 'Vazirmatn', sans-serif; cursor: pointer; font-weight: 700; white-space: nowrap; }
+.btn-logout { background: rgba(255,255,255,0.15); color: #FFF; border: 1px solid rgba(255,255,255,0.3); border-radius: 8px; padding: 5px 10px; font-size: 12px; font-family: 'Vazirmatn', sans-serif; cursor: pointer; display: flex; align-items: center; gap: 5px; }
+.user-avatar { width: 24px; height: 24px; border-radius: 50%; object-fit: cover; }
+
 .install-banner { background: #FFF3E0; border: 1px solid #FFCC80; border-radius: 12px; padding: 10px 14px; margin: 10px 1rem 0; display: flex; align-items: center; gap: 10px; font-size: 13px; color: #5D4037; }
 .install-banner button { margin-right: auto; background: var(--accent); color: #FFF; border: none; border-radius: 8px; padding: 6px 12px; font-size: 12px; font-family: 'Vazirmatn', sans-serif; cursor: pointer; white-space: nowrap; }
 .install-banner .close-banner { background: none; border: none; color: var(--muted); font-size: 18px; cursor: pointer; padding: 0; margin-right: 0; }
+
+/* AUTH */
+.btn-login { background: #FFF; color: var(--accent); border: none; border-radius: 8px; padding: 6px 12px; font-size: 13px; font-family: 'Vazirmatn', sans-serif; cursor: pointer; font-weight: 700; display: flex; align-items: center; gap: 5px; white-space: nowrap; }
+.btn-logout { background: rgba(255,255,255,0.15); color: #FFF; border: 1px solid rgba(255,255,255,0.3); border-radius: 8px; padding: 5px 10px; font-size: 12px; font-family: 'Vazirmatn', sans-serif; cursor: pointer; display: flex; align-items: center; gap: 5px; }
+.user-avatar { width: 24px; height: 24px; border-radius: 50%; object-fit: cover; }
+.fab.hidden { display: none; }
 
 @media(min-width:600px) { .grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); } }
 
@@ -144,10 +155,11 @@ body { font-family: 'Vazirmatn', sans-serif; background: var(--bg); color: var(-
 
 <header class="app-header">
   <div class="header-top">
-    <div class="app-title">🍳 آشپزخانه ما</div>
+    <div class="app-title">🍳 آشپزخانه من</div>
     <div style="display:flex;align-items:center;gap:8px">
       <span id="sync-indicator" title="وضعیت اتصال"><span class="sync-dot syncing"></span></span>
       <span class="count-badge" id="count-badge">۰ دستور</span>
+      <div id="auth-btn-wrap"></div>
     </div>
   </div>
   <div class="search-wrap">
@@ -204,7 +216,8 @@ body { font-family: 'Vazirmatn', sans-serif; background: var(--bg); color: var(-
 <!-- Firebase SDKs -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, collection, doc, addDoc, updateDoc, deleteDoc, onSnapshot, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, collection, doc, addDoc, updateDoc, deleteDoc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyC2A9GrlvDQ9IZR2dRwomOrIzhGTeV2f9U",
@@ -217,10 +230,43 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
 
 const EMOJIS = ['🍲','🍝','🍛','🥗','🍜','🫕','🥘','🍱','🥙','🫔','🍖','🥩','🐟','🍣','🥞','🧆','🍰','🎂','🧁','🍩','☕','🫖','🍕','🥗','🧇','🥐','🫙','🍯'];
 let recipes = [], categories = [], activeFilter = 'همه', selEmoji = EMOJIS[0], editingId = null, deferredPrompt = null;
+let currentUser = null;
 function toF(n) { return String(n).replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]); }
+
+/* AUTH */
+function renderAuthBtn() {
+  const wrap = document.getElementById('auth-btn-wrap');
+  if (!wrap) return;
+  if (currentUser) {
+    wrap.innerHTML = `<button class="btn-logout" onclick="window._signOut()">
+      ${currentUser.photoURL ? `<img src="${currentUser.photoURL}" class="user-avatar">` : '👤'}
+      خروج
+    </button>`;
+  } else {
+    wrap.innerHTML = `<button class="btn-login" onclick="window._signIn()">🔑 ورود</button>`;
+  }
+}
+
+window._signIn = async function() {
+  try { await signInWithPopup(auth, provider); }
+  catch(e) { alert('خطا در ورود: ' + e.message); }
+};
+window._signOut = async function() {
+  if (confirm('از حساب خارج شوید؟')) await signOut(auth);
+};
+
+onAuthStateChanged(auth, user => {
+  currentUser = user;
+  renderAuthBtn();
+  const fab = document.querySelector('.fab');
+  if (fab) fab.classList.toggle('hidden', !user);
+  renderAll();
+});
 
 function setSyncStatus(status) {
   const dot = document.querySelector('#sync-indicator .sync-dot');
@@ -254,10 +300,12 @@ function renderFilters() {
   const all = ['همه', 'مورد علاقه', ...categories];
   const wrap = document.getElementById('filters-wrap');
   wrap.innerHTML = '';
-  const manBtn = document.createElement('button');
-  manBtn.className = 'filter-manage-btn'; manBtn.title = 'مدیریت دسته‌بندی‌ها'; manBtn.textContent = '⚙';
-  manBtn.onclick = openCatManager;
-  wrap.appendChild(manBtn);
+  if (currentUser) {
+    const manBtn = document.createElement('button');
+    manBtn.className = 'filter-manage-btn'; manBtn.title = 'مدیریت دسته‌بندی‌ها'; manBtn.textContent = '⚙';
+    manBtn.onclick = () => window._openCatManager();
+    wrap.appendChild(manBtn);
+  }
   all.forEach(c => {
     const b = document.createElement('button');
     b.className = 'filter-btn' + (c === activeFilter ? ' active' : '');
@@ -300,6 +348,7 @@ function fillCatSelect() {
 }
 
 window._openAdd = function() {
+  if (!currentUser) { alert('برای افزودن دستور، ابتدا وارد شوید'); window._signIn(); return; }
   editingId = null;
   document.getElementById('f-name').value = '';
   document.getElementById('f-time').value = '';
@@ -312,6 +361,7 @@ window._openAdd = function() {
 };
 
 window._openEdit = function(id) {
+  if (!currentUser) return;
   const r = recipes.find(x => x.id===id); if (!r) return;
   editingId = id;
   fillCatSelect();
@@ -348,7 +398,13 @@ window._saveRecipe = async function() {
 
 window._openDetail = function(id) {
   const r = recipes.find(x => x.id===id); if (!r) return;
-  document.getElementById('detail-sheet').innerHTML = `
+  const ownerBtns = currentUser ? `
+    <div class="action-row">
+      <button class="btn-fav-toggle${r.fav?' active':''}" onclick="window._toggleFav('${r.id}')">${r.fav?'❤️ علاقه‌مندی':'🤍 علاقه‌مندی'}</button>
+      <button class="btn-edit" onclick="window._openEdit('${r.id}')">✏️ ویرایش</button>
+      <button class="btn-delete" onclick="window._deleteRecipe('${r.id}')">🗑 حذف</button>
+    </div>` : '';
+  document.getElementById('detail-sheet').innerHTML=`
     <div class="sheet-handle"></div>
     <div class="detail-emoji">${r.emoji||'🍽️'}</div>
     <div class="detail-title">${r.name}</div>
@@ -359,155 +415,12 @@ window._openDetail = function(id) {
     </div>
     ${r.ing?`<div class="detail-section"><h3>مواد لازم</h3><div class="detail-text">${r.ing}</div></div>`:''}
     ${r.steps?`<div class="detail-section"><h3>طرز تهیه</h3><div class="detail-text">${r.steps}</div></div>`:''}
-    <div class="action-row">
-      <button class="btn-fav-toggle${r.fav?' active':''}" onclick="window._toggleFav('${r.id}')">${r.fav?'❤️ علاقه‌مادی':'🤍 علاقه‌مادی'}</button>
-      <button class="btn-edit" onclick="window._openEdit('${r.id}')">✏️ ویرایش</button>
-      <button class="btn-delete" onclick="window._deleteRecipe('${r.id}')">🗑 حذف</button>
-    </div>
+    ${ownerBtns}
     <button class="btn-save" style="width:100%;margin-top:10px;border-radius:10px" onclick="window._downloadPDF('${r.id}')">📄 دانلود PDF</button>
     <button class="btn-close-detail" onclick="closeDetail()">بستن</button>`;
   document.getElementById('detail-overlay').classList.add('open');
 };
 
-window._toggleFav = async function(id) {
-  const r = recipes.find(x => x.id===id); if (!r) return;
-  setSyncStatus('syncing');
-  await updateDoc(doc(db, 'recipes', id), { fav: !r.fav });
-  window._openDetail(id);
-};
-
-window._deleteRecipe = async function(id) {
-  if (!confirm('این دستور حذف شود؟')) return;
-  setSyncStatus('syncing');
-  await deleteDoc(doc(db, 'recipes', id));
-  closeDetail();
-};
-
-/* CATEGORY MANAGER */
-window._openCatManager = function() {
-  renderCatList();
-  document.getElementById('new-cat-input').value = '';
-  document.getElementById('cat-overlay').classList.add('open');
-};
-
-function renderCatList() {
-  document.getElementById('cat-list').innerHTML = categories.map((c,i) => `
-    <div class="cat-item" id="cat-item-${i}">
-      <span>${c}</span>
-      <div style="display:flex;gap:4px">
-        <button class="cat-edit-btn" onclick="window._startEditCat(${i})">✏️</button>
-        <button class="cat-del-btn" onclick="window._deleteCat(${i})">✕</button>
-      </div>
-    </div>`).join('') || '<p style="color:var(--muted);font-size:13px;text-align:center">هنوز دسته‌بندی ندارید</p>';
-}
-
-window._startEditCat = function(i) {
-  const item = document.getElementById('cat-item-'+i);
-  const old = categories[i];
-  item.innerHTML = `
-    <input type="text" id="cat-edit-${i}" value="${old}" style="flex:1;font-family:Vazirmatn,sans-serif;font-size:14px;padding:6px 10px;border:1.5px solid var(--accent2);border-radius:8px;outline:none;color:var(--text)" onkeydown="if(event.key==='Enter')window._saveEditCat(${i});if(event.key==='Escape')renderCatList()">
-    <div style="display:flex;gap:6px;margin-right:6px">
-      <button class="cat-add-btn" style="padding:6px 12px;font-size:13px" onclick="window._saveEditCat(${i})">✓</button>
-      <button class="cat-del-btn" onclick="renderCatList()">✕</button>
-    </div>`;
-  item.style.gap='8px';
-  document.getElementById('cat-edit-'+i).focus();
-};
-
-window._saveEditCat = async function(i) {
-  const newName = (document.getElementById('cat-edit-'+i).value||'').trim();
-  if (!newName) return;
-  if (categories.includes(newName) && newName !== categories[i]) { alert('این نام قبلاً وجود دارد'); return; }
-  const oldName = categories[i];
-  categories[i] = newName;
-  // update all recipes with this category
-  const toUpdate = recipes.filter(r => r.cat === oldName);
-  await Promise.all(toUpdate.map(r => updateDoc(doc(db,'recipes',r.id), { cat: newName })));
-  if (activeFilter === oldName) activeFilter = newName;
-  await saveCategoriesToDB();
-  renderCatList();
-};
-
-window._addCategory = async function() {
-  const inp = document.getElementById('new-cat-input');
-  const val = inp.value.trim();
-  if (!val) return;
-  if (categories.includes(val)) { alert('این دسته‌بندی قبلاً وجود دارد'); return; }
-  categories.push(val);
-  await saveCategoriesToDB();
-  inp.value = ''; renderCatList();
-};
-
-window._deleteCat = async function(i) {
-  const cat = categories[i];
-  const count = recipes.filter(r => r.cat === cat).length;
-  if (count && !confirm(`دسته‌بندی "${cat}" در ${toF(count)} دستور استفاده شده. حذف شود؟`)) return;
-  categories.splice(i, 1);
-  await saveCategoriesToDB();
-  renderCatList();
-  if (activeFilter === cat) activeFilter = 'همه';
-};
-
-/* PDF DOWNLOAD */
-window._downloadPDF = function(id) {
-  const r = recipes.find(x => x.id===id); if (!r) return;
-  const favLine = r.fav ? '<div class="pdf-fav">❤️ مورد علاقه</div>' : '';
-  const timeChip = r.time ? `<span class="pdf-chip">⏱ ${r.time} دقیقه</span>` : '';
-  const ingSection = r.ing ? `
-    <div class="pdf-section">
-      <div class="pdf-section-title">مواد لازم</div>
-      <div class="pdf-section-body">${r.ing.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
-    </div>` : '';
-  const stepsSection = r.steps ? `
-    <div class="pdf-section">
-      <div class="pdf-section-title">طرز تهیه</div>
-      <div class="pdf-section-body">${r.steps.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
-    </div>` : '';
-  const now = new Date().toLocaleDateString('fa-IR');
-
-  document.getElementById('pdf-frame').innerHTML = `
-    <div class="pdf-page">
-      <div class="pdf-header">
-        <div class="pdf-header-emoji">${r.emoji||'🍽️'}</div>
-        <div class="pdf-header-info">
-          <h1>${r.name}</h1>
-          <div class="pdf-chips">
-            ${timeChip}
-            ${r.diff ? `<span class="pdf-chip">${r.diff}</span>` : ''}
-            ${r.cat ? `<span class="pdf-chip">${r.cat}</span>` : ''}
-          </div>
-          ${favLine}
-        </div>
-      </div>
-      ${ingSection}
-      ${stepsSection}
-      <div class="pdf-footer">آشپزخانه ما · ${now}</div>
-    </div>`;
-
-  setTimeout(() => {
-    window.print();
-  }, 150);
-};
-
-/* PWA */
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(()=>{}));
-}
-window.addEventListener('beforeinstallprompt', e => {
-  e.preventDefault(); deferredPrompt = e;
-  if (!localStorage.getItem('install-dismissed')) {
-    document.getElementById('install-banner-wrap').innerHTML = `<div class="install-banner">📲 این اپ را به صفحه اصلی گوشیت اضافه کن!<button onclick="window._installApp()">نصب</button><button class="close-banner" onclick="window._dismissBanner()">✕</button></div>`;
-  }
-});
-window._installApp = () => { if(!deferredPrompt)return; deferredPrompt.prompt(); deferredPrompt.userChoice.then(()=>{ deferredPrompt=null; document.getElementById('install-banner-wrap').innerHTML=''; }); };
-window._dismissBanner = () => { localStorage.setItem('install-dismissed','1'); document.getElementById('install-banner-wrap').innerHTML=''; };
-
-</script>
-
-<script>
-// Bridge functions for onclick attributes
-function openAdd() { window._openAdd && window._openAdd(); }
-function closeAdd() { document.getElementById('add-overlay').classList.remove('open'); }
 function closeDetail() { document.getElementById('detail-overlay').classList.remove('open'); }
 function openCatManager() { window._openCatManager && window._openCatManager(); }
 function closeCatManager() { document.getElementById('cat-overlay').classList.remove('open'); }
