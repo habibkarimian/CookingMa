@@ -220,28 +220,121 @@ function setSyncStatus(s) {
 
 // ── AUTH ─────────────────────────────────────────────────────
 const OWNER_EMAIL = 'habibkarimian1990@gmail.com';
+// SHA-256 hash of the owner password (never store plain text)
+// This is the hash of: Ashpaz@1990
+const OWNER_PWD_HASH = '610b4b1268d7cf24d1e05f4b60518f0713f9302612adfd277d89b6ac26bee041';
 
-onAuthStateChanged(auth, user => {
-  // Only allow the owner email to be considered logged in as editor
-  currentUser = (user && user.email === OWNER_EMAIL) ? user : null;
-  const wrap = document.getElementById('auth-wrap');
-  if(user && user.email !== OWNER_EMAIL) {
-    // Wrong account — sign them out silently
+async function sha256(str) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+// Session-level password verification (cleared when tab closes)
+let ownerVerified = false;
+
+async function verifyAndLogin(user) {
+  // Show PIN modal
+  showPinModal(async (pin) => {
+    const hash = await sha256(pin);
+    if(hash === OWNER_PWD_HASH) {
+      ownerVerified = true;
+      currentUser = user;
+      renderAuthBtn(user);
+      document.getElementById('fab').classList.remove('hidden');
+      renderAll();
+    } else {
+      alert('رمز اشتباه است!');
+      await signOut(auth);
+      ownerVerified = false;
+      currentUser = null;
+      renderAuthBtn(null);
+      document.getElementById('fab').classList.add('hidden');
+      renderAll();
+    }
+  }, () => {
+    // cancelled
     signOut(auth);
-    wrap.innerHTML = '';
+    ownerVerified = false;
+    currentUser = null;
+    renderAuthBtn(null);
     document.getElementById('fab').classList.add('hidden');
-    renderAll();
-    return;
-  }
-  if(currentUser) {
+  });
+}
+
+function renderAuthBtn(user) {
+  const wrap = document.getElementById('auth-wrap');
+  if(user && ownerVerified) {
     wrap.innerHTML = `<button class="btn-logout" id="logout-btn">
       ${user.photoURL?`<img src="${user.photoURL}" class="user-avatar">`:'👤'} خروج
     </button>`;
-    document.getElementById('logout-btn').onclick = () => { if(confirm('از حساب خارج شوید؟')) signOut(auth); };
-    document.getElementById('fab').classList.remove('hidden');
+    document.getElementById('logout-btn').onclick = () => {
+      if(confirm('از حساب خارج شوید؟')) {
+        signOut(auth);
+        ownerVerified = false;
+      }
+    };
   } else {
     wrap.innerHTML = `<button class="btn-login" id="login-btn">🔑 ورود</button>`;
     document.getElementById('login-btn').onclick = () => signInWithPopup(auth, gProvider).catch(e=>alert('خطا: '+e.message));
+  }
+}
+
+function showPinModal(onConfirm, onCancel) {
+  // Remove any existing pin modal
+  const existing = document.getElementById('pin-overlay');
+  if(existing) existing.remove();
+  const el = document.createElement('div');
+  el.id = 'pin-overlay';
+  el.style.cssText = 'position:fixed;inset:0;background:rgba(44,24,16,.6);z-index:999;display:flex;align-items:center;justify-content:center;padding:1rem';
+  el.innerHTML = `
+    <div style="background:#FFF;border-radius:20px;padding:2rem 1.5rem;width:100%;max-width:320px;text-align:center;font-family:Vazirmatn,sans-serif">
+      <div style="font-size:36px;margin-bottom:12px">🔐</div>
+      <div style="font-size:17px;font-weight:700;color:#2C1810;margin-bottom:6px">رمز ویرایشگر</div>
+      <div style="font-size:13px;color:#8B6E5A;margin-bottom:1.25rem">رمز عبور را وارد کنید</div>
+      <input id="pin-input" type="password" placeholder="رمز عبور..."
+        style="width:100%;border:1.5px solid #E8D5C4;border-radius:10px;padding:11px 14px;font-size:16px;font-family:Vazirmatn,sans-serif;outline:none;text-align:center;margin-bottom:1rem;direction:ltr">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <button id="pin-cancel" style="background:#F5EAE0;border:none;border-radius:10px;padding:12px;font-size:15px;font-family:Vazirmatn,sans-serif;color:#8B6E5A;cursor:pointer;font-weight:500">انصراف</button>
+        <button id="pin-confirm" style="background:#C0622F;border:none;border-radius:10px;padding:12px;font-size:15px;font-family:Vazirmatn,sans-serif;color:#FFF;cursor:pointer;font-weight:700">تأیید</button>
+      </div>
+    </div>`;
+  document.body.appendChild(el);
+  const inp = document.getElementById('pin-input');
+  inp.focus();
+  inp.onkeydown = e => { if(e.key==='Enter') confirm(); };
+  document.getElementById('pin-confirm').onclick = confirm;
+  document.getElementById('pin-cancel').onclick = () => { el.remove(); onCancel && onCancel(); };
+  async function confirm() {
+    const val = inp.value;
+    if(!val) return;
+    el.remove();
+    await onConfirm(val);
+  }
+}
+
+onAuthStateChanged(auth, async user => {
+  const wrap = document.getElementById('auth-wrap');
+  if(user && user.email === OWNER_EMAIL) {
+    if(!ownerVerified) {
+      // Need password verification
+      await verifyAndLogin(user);
+    } else {
+      currentUser = user;
+      renderAuthBtn(user);
+      document.getElementById('fab').classList.remove('hidden');
+    }
+  } else if(user && user.email !== OWNER_EMAIL) {
+    // Wrong account, sign out immediately
+    await signOut(auth);
+    currentUser = null;
+    ownerVerified = false;
+    renderAuthBtn(null);
+    document.getElementById('fab').classList.add('hidden');
+    alert('این حساب دسترسی ویرایش ندارد.');
+  } else {
+    currentUser = null;
+    ownerVerified = false;
+    renderAuthBtn(null);
     document.getElementById('fab').classList.add('hidden');
   }
   renderAll();
