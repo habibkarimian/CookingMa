@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#C0622F">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="آشپزخانه">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>آشپزخانه من</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #FDF8F3;
+  --card: #FFFFFF;
+  --accent: #C0622F;
+  --accent2: #E8956D;
+  --text: #2C1810;
+  --muted: #8B6E5A;
+  --border: #E8D5C4;
+  --fav: #E24B4A;
+  --tag-bg: #F5EAE0;
+  --shadow: 0 2px 12px rgba(44,24,16,0.08);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body { font-family: 'Vazirmatn', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overscroll-behavior: none; }
+
+/* HEADER */
+.app-header { background: var(--accent); padding: 1rem 1rem 0.75rem; position: sticky; top: 0; z-index: 50; box-shadow: 0 2px 10px rgba(192,98,47,0.3); }
+.header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; }
+.app-title { color: #FFF; font-size: 19px; font-weight: 700; display: flex; align-items: center; gap: 7px; }
+.count-badge { background: rgba(255,255,255,0.2); color: #FFF; font-size: 12px; padding: 3px 10px; border-radius: 20px; }
+.search-wrap { position: relative; }
+.search-wrap input { width: 100%; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); border-radius: 10px; padding: 9px 36px 9px 12px; font-size: 14px; color: #FFF; font-family: 'Vazirmatn', sans-serif; outline: none; }
+.search-wrap input::placeholder { color: rgba(255,255,255,0.6); }
+.search-icon { position: absolute; right: 11px; top: 50%; transform: translateY(-50%); color: rgba(255,255,255,0.7); }
+
+/* FILTERS */
+.filters-wrap { background: var(--card); border-bottom: 1px solid var(--border); padding: 0.6rem 1rem; display: flex; align-items: center; gap: 6px; overflow-x: auto; scrollbar-width: none; }
+.filters-wrap::-webkit-scrollbar { display: none; }
+.filter-btn { white-space: nowrap; padding: 5px 13px; border-radius: 20px; border: 1.5px solid var(--border); background: transparent; color: var(--muted); font-size: 13px; font-family: 'Vazirmatn', sans-serif; cursor: pointer; font-weight: 500; flex-shrink: 0; }
+.filter-btn.active { background: var(--accent); color: #FFF; border-color: var(--accent); }
+.filter-manage-btn { flex-shrink: 0; width: 32px; height: 32px; border-radius: 50%; border: 1.5px dashed var(--border); background: transparent; color: var(--muted); font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+
+/* GRID */
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(155px, 1fr)); gap: 12px; padding: 1rem 1rem 7rem; }
+.recipe-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 1rem; cursor: pointer; box-shadow: var(--shadow); position: relative; transition: transform 0.12s; }
+.recipe-card:active { transform: scale(0.97); }
+.card-emoji { font-size: 32px; margin-bottom: 8px; display: block; }
+.card-name { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 5px; line-height: 1.4; }
+.card-info { font-size: 12px; color: var(--muted); }
+.card-tag { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 20px; background: var(--tag-bg); color: var(--accent); font-weight: 500; margin-top: 8px; }
+.fav-dot { position: absolute; top: 9px; left: 9px; font-size: 14px; display: none; }
+.fav-dot.show { display: block; }
+.empty { grid-column: 1/-1; text-align: center; padding: 4rem 1rem; color: var(--muted); }
+.empty-emoji { font-size: 48px; margin-bottom: 12px; }
+
+/* FAB */
+.fab { position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%); background: var(--accent); color: #FFF; border: none; border-radius: 50px; padding: 13px 26px; font-size: 16px; font-family: 'Vazirmatn', sans-serif; font-weight: 700; cursor: pointer; box-shadow: 0 4px 20px rgba(192,98,47,0.4); display: flex; align-items: center; gap: 8px; z-index: 100; }
+
+/* OVERLAYS */
+.overlay { display: none; position: fixed; inset: 0; background: rgba(44,24,16,0.45); z-index: 200; align-items: flex-end; justify-content: center; }
+.overlay.open { display: flex; }
+.sheet { background: var(--card); border-radius: 20px 20px 0 0; width: 100%; max-width: 520px; max-height: 92vh; overflow-y: auto; padding: 1.25rem 1rem 2.5rem; animation: slideUp 0.22s ease; }
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+.sheet-handle { width: 36px; height: 4px; background: var(--border); border-radius: 4px; margin: 0 auto 1.1rem; }
+.sheet-title { font-size: 17px; font-weight: 700; margin-bottom: 1.1rem; }
+
+/* FORM */
+.form-group { margin-bottom: 0.9rem; }
+.form-group label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 4px; font-weight: 500; }
+.form-group input, .form-group select, .form-group textarea { width: 100%; background: #FFF; border: 1.5px solid var(--border); border-radius: 10px; padding: 10px 12px; font-size: 14px; color: var(--text); font-family: 'Vazirmatn', sans-serif; outline: none; }
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--accent2); }
+.form-group textarea { min-height: 85px; resize: vertical; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.emoji-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 5px; margin-top: 4px; }
+.emoji-opt { font-size: 20px; text-align: center; padding: 5px; border-radius: 8px; cursor: pointer; border: 2px solid transparent; }
+.emoji-opt.sel { border-color: var(--accent); background: var(--tag-bg); }
+.btn-row { display: grid; grid-template-columns: 1fr 2fr; gap: 10px; margin-top: 1.1rem; }
+.btn-cancel { background: var(--tag-bg); border: none; border-radius: 10px; padding: 12px; font-size: 15px; font-family: 'Vazirmatn', sans-serif; color: var(--muted); cursor: pointer; font-weight: 500; }
+.btn-save { background: var(--accent); border: none; border-radius: 10px; padding: 12px; font-size: 15px; font-family: 'Vazirmatn', sans-serif; color: #FFF; cursor: pointer; font-weight: 700; }
+
+/* DETAIL */
+.detail-emoji { font-size: 46px; text-align: center; margin-bottom: 6px; }
+.detail-title { font-size: 21px; font-weight: 700; text-align: center; margin-bottom: 6px; }
+.detail-meta { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; font-size: 13px; margin-bottom: 1rem; }
+.meta-chip { background: var(--tag-bg); padding: 4px 10px; border-radius: 20px; color: var(--accent); font-weight: 500; }
+.detail-section { margin-top: 1rem; }
+.detail-section h3 { font-size: 12px; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 7px; border-bottom: 1px solid var(--border); padding-bottom: 4px; }
+.detail-text { font-size: 14px; line-height: 1.9; white-space: pre-wrap; }
+.action-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 1.25rem; }
+.btn-fav-toggle { border: 1.5px solid var(--fav); background: transparent; border-radius: 10px; padding: 11px; font-size: 14px; font-family: 'Vazirmatn', sans-serif; color: var(--fav); cursor: pointer; font-weight: 500; }
+.btn-fav-toggle.active { background: var(--fav); color: #FFF; }
+.btn-delete { border: 1.5px solid var(--border); background: transparent; border-radius: 10px; padding: 11px; font-size: 14px; font-family: 'Vazirmatn', sans-serif; color: var(--muted); cursor: pointer; }
+.btn-close-detail { background: var(--accent); border: none; border-radius: 10px; padding: 12px; font-size: 15px; font-family: 'Vazirmatn', sans-serif; color: #FFF; cursor: pointer; font-weight: 700; margin-top: 10px; width: 100%; }
+
+/* CATEGORY MANAGER */
+.cat-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 1rem; }
+.cat-item { display: flex; align-items: center; justify-content: space-between; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; font-size: 14px; }
+.cat-del-btn { background: none; border: none; color: var(--muted); font-size: 18px; cursor: pointer; padding: 0 4px; }
+.cat-del-btn:hover { color: var(--fav); }
+.cat-add-row { display: flex; gap: 8px; }
+.cat-add-row input { flex: 1; }
+.cat-add-btn { background: var(--accent); color: #FFF; border: none; border-radius: 10px; padding: 10px 16px; font-size: 14px; font-family: 'Vazirmatn', sans-serif; cursor: pointer; font-weight: 700; white-space: nowrap; }
+
+/* INSTALL BANNER */
+.install-banner { background: #FFF3E0; border: 1px solid #FFCC80; border-radius: 12px; padding: 10px 14px; margin: 10px 1rem 0; display: flex; align-items: center; gap: 10px; font-size: 13px; color: #5D4037; }
+.install-banner button { margin-right: auto; background: var(--accent); color: #FFF; border: none; border-radius: 8px; padding: 6px 12px; font-size: 12px; font-family: 'Vazirmatn', sans-serif; cursor: pointer; white-space: nowrap; }
+.install-banner .close-banner { background: none; border: none; color: var(--muted); font-size: 18px; cursor: pointer; padding: 0; margin-right: 0; }
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <div class="header-top">
+    <div class="app-title">🍳 آشپزخانه من</div>
+    <span class="count-badge" id="count-badge">۰ دستور</span>
+  </div>
+  <div class="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input type="search" id="search" placeholder="جستجو در دستورها..." oninput="renderGrid()">
+  </div>
+</header>
+
+<div id="install-banner-wrap"></div>
+
+<div class="filters-wrap" id="filters-wrap">
+  <button class="filter-manage-btn" onclick="openCatManager()" title="مدیریت دسته‌بندی‌ها">＋</button>
+</div>
+
+<div class="grid" id="grid"></div>
+
+<button class="fab" onclick="openAdd()">＋ دستور جدید</button>
+
+<!-- ADD MODAL -->
+<div class="overlay" id="add-overlay" onclick="overlayClick(event,'add-overlay',closeAdd)">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">📝 دستور آشپزی جدید</div>
+    <div class="form-group">
+      <label>نام غذا *</label>
+      <input type="text" id="f-name" placeholder="مثلاً: قورمه‌سبزی">
+    </div>
+    <div class="form-group">
+      <label>ایموجی</label>
+      <div class="emoji-grid" id="emoji-grid"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>دسته‌بندی</label>
+        <select id="f-cat"></select>
+      </div>
+      <div class="form-group">
+        <label>سختی</label>
+        <select id="f-diff">
+          <option>آسان</option><option>متوسط</option><option>پیشرفته</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>زمان پخت (دقیقه)</label>
+      <input type="number" id="f-time" placeholder="مثلاً: ۶۰" min="1">
+    </div>
+    <div class="form-group">
+      <label>مواد لازم</label>
+      <textarea id="f-ing" placeholder="هر ماده در یک خط..."></textarea>
+    </div>
+    <div class="form-group">
+      <label>طرز تهیه</label>
+      <textarea id="f-steps" placeholder="مراحل پخت..."></textarea>
+    </div>
+    <div class="btn-row">
+      <button class="btn-cancel" onclick="closeAdd()">انصراف</button>
+      <button class="btn-save" onclick="saveRecipe()">💾 ذخیره کن</button>
+    </div>
+  </div>
+</div>
+
+<!-- DETAIL MODAL -->
+<div class="overlay" id="detail-overlay" onclick="overlayClick(event,'detail-overlay',closeDetail)">
+  <div class="sheet" id="detail-sheet"></div>
+</div>
+
+<!-- CATEGORY MANAGER -->
+<div class="overlay" id="cat-overlay" onclick="overlayClick(event,'cat-overlay',closeCatManager)">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">🗂 مدیریت دسته‌بندی‌ها</div>
+    <div class="cat-list" id="cat-list"></div>
+    <div class="cat-add-row">
+      <input type="text" id="new-cat-input" placeholder="نام دسته‌بندی جدید..." onkeydown="if(event.key==='Enter')addCategory()">
+      <button class="cat-add-btn" onclick="addCategory()">+ اضافه</button>
+    </div>
+    <div class="btn-row" style="margin-top:1rem">
+      <div></div>
+      <button class="btn-save" onclick="closeCatManager()">✓ تمام</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const EMOJIS = ['🍲','🍝','🍛','🥗','🍜','🫕','🥘','🍱','🥙','🫔','🍖','🥩','🐟','🍣','🥞','🧆','🍰','🎂','🧁','🍩','☕','🫖','🍕','🥗','🧇','🥐','🫙','🍯'];
+const KEYS = { recipes: 'ashpaz-recipes-v2', cats: 'ashpaz-cats-v2' };
+let recipes = [], categories = [], activeFilter = 'همه', selEmoji = EMOJIS[0], deferredPrompt = null;
+
+function toF(n) { return String(n).replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]); }
+
+function load() {
+  try { recipes = JSON.parse(localStorage.getItem(KEYS.recipes) || '[]'); } catch(e) { recipes = []; }
+  try { categories = JSON.parse(localStorage.getItem(KEYS.cats) || 'null') || ['ایرانی','ایتالیایی','سالاد','سوپ','دسر','سریع','سایر']; } catch(e) { categories = ['ایرانی','ایتالیایی','سالاد','سوپ','دسر','سریع','سایر']; }
+  if (!recipes.length) {
+    recipes = [
+      { id: 1, name: 'قورمه‌سبزی', cat: 'ایرانی', emoji: '🍲', time: 120, diff: 'متوسط', fav: true, ing: 'گوشت گوسفند ۵۰۰ گرم\nسبزی قورمه ۳۰۰ گرم\nلوبیا قرمز ۱ پیمانه\nلیمو عمانی ۳ عدد\nپیاز ۲ عدد', steps: '۱. سبزی را تفت دهید.\n۲. گوشت را با پیاز و زردچوبه سرخ کنید.\n۳. همه مواد را ترکیب کرده و ۱.۵ ساعت بپزید.' },
+      { id: 2, name: 'پاستا کربونارا', cat: 'ایتالیایی', emoji: '🍝', time: 25, diff: 'آسان', fav: false, ing: 'پاستا ۲۵۰ گرم\nتخم مرغ ۲ عدد\nپنیر پارمزان ۵۰ گرم\nبیکن ۱۰۰ گرم', steps: '۱. پاستا را بپزید.\n۲. بیکن را تفت دهید.\n۳. تخم مرغ و پنیر را مخلوط کرده، با پاستای داغ ترکیب کنید.' },
+    ];
+    save();
+  }
+  renderAll();
+}
+
+function save() {
+  localStorage.setItem(KEYS.recipes, JSON.stringify(recipes));
+  localStorage.setItem(KEYS.cats, JSON.stringify(categories));
+}
+
+function renderAll() { renderFilters(); renderGrid(); }
+
+function renderFilters() {
+  const all = ['همه', 'مورد علاقه', ...categories];
+  const wrap = document.getElementById('filters-wrap');
+  wrap.innerHTML = '';
+  const manBtn = document.createElement('button');
+  manBtn.className = 'filter-manage-btn'; manBtn.title = 'مدیریت دسته‌بندی‌ها'; manBtn.textContent = '⚙';
+  manBtn.onclick = openCatManager;
+  wrap.appendChild(manBtn);
+  all.forEach(c => {
+    const b = document.createElement('button');
+    b.className = 'filter-btn' + (c === activeFilter ? ' active' : '');
+    b.textContent = (c === 'مورد علاقه' ? '❤️ ' : '') + c;
+    b.onclick = () => { activeFilter = c; renderAll(); };
+    wrap.appendChild(b);
+  });
+  document.getElementById('count-badge').textContent = toF(recipes.length) + ' دستور';
+}
+
+function renderGrid() {
+  const q = (document.getElementById('search').value || '').trim().toLowerCase();
+  let list = [...recipes];
+  if (activeFilter === 'مورد علاقه') list = list.filter(r => r.fav);
+  else if (activeFilter !== 'همه') list = list.filter(r => r.cat === activeFilter);
+  if (q) list = list.filter(r => r.name.toLowerCase().includes(q) || r.cat.toLowerCase().includes(q));
+  const grid = document.getElementById('grid');
+  if (!list.length) {
+    grid.innerHTML = `<div class="empty"><div class="empty-emoji">${recipes.length ? '🔍' : '🍽️'}</div><p>${recipes.length ? 'دستوری پیدا نشد' : 'هنوز دستوری ندارید!'}<br><small style="font-size:13px;color:var(--muted)">روی + بزنید و اولین دستور را اضافه کنید</small></p></div>`;
+    return;
+  }
+  grid.innerHTML = list.map(r => `
+    <div class="recipe-card" onclick="openDetail(${r.id})">
+      <span class="fav-dot${r.fav ? ' show' : ''}">❤️</span>
+      <span class="card-emoji">${r.emoji}</span>
+      <div class="card-name">${r.name}</div>
+      <div class="card-info">${r.time ? '⏱ ' + toF(r.time) + ' دقیقه · ' : ''}${r.diff}</div>
+      <span class="card-tag">${r.cat}</span>
+    </div>`).join('');
+}
+
+function buildEmojiGrid() {
+  document.getElementById('emoji-grid').innerHTML = EMOJIS.map(e =>
+    `<div class="emoji-opt${e===selEmoji?' sel':''}" onclick="pickEmoji('${e}')">${e}</div>`).join('');
+}
+function pickEmoji(e) { selEmoji = e; buildEmojiGrid(); }
+
+function fillCatSelect() {
+  const sel = document.getElementById('f-cat');
+  sel.innerHTML = categories.map(c => `<option>${c}</option>`).join('');
+}
+
+function openAdd() {
+  document.getElementById('f-name').value = '';
+  document.getElementById('f-time').value = '';
+  document.getElementById('f-ing').value = '';
+  document.getElementById('f-steps').value = '';
+  selEmoji = EMOJIS[0]; buildEmojiGrid(); fillCatSelect();
+  document.getElementById('add-overlay').classList.add('open');
+}
+function closeAdd() { document.getElementById('add-overlay').classList.remove('open'); }
+
+function saveRecipe() {
+  const name = document.getElementById('f-name').value.trim();
+  if (!name) { alert('لطفاً نام غذا را وارد کنید'); return; }
+  recipes.unshift({ id: Date.now(), name, cat: document.getElementById('f-cat').value, emoji: selEmoji, time: parseInt(document.getElementById('f-time').value)||0, diff: document.getElementById('f-diff').value, fav: false, ing: document.getElementById('f-ing').value.trim(), steps: document.getElementById('f-steps').value.trim() });
+  save(); renderAll(); closeAdd();
+}
+
+function openDetail(id) {
+  const r = recipes.find(x => x.id===id); if (!r) return;
+  document.getElementById('detail-sheet').innerHTML = `
+    <div class="sheet-handle"></div>
+    <div class="detail-emoji">${r.emoji}</div>
+    <div class="detail-title">${r.name}</div>
+    <div class="detail-meta">${r.time?`<span class="meta-chip">⏱ ${toF(r.time)} دقیقه</span>`:''}<span class="meta-chip">${r.diff}</span><span class="meta-chip">${r.cat}</span></div>
+    ${r.ing?`<div class="detail-section"><h3>مواد لازم</h3><div class="detail-text">${r.ing}</div></div>`:''}
+    ${r.steps?`<div class="detail-section"><h3>طرز تهیه</h3><div class="detail-text">${r.steps}</div></div>`:''}
+    <div class="action-row">
+      <button class="btn-fav-toggle${r.fav?' active':''}" onclick="toggleFav(${r.id})">${r.fav?'❤️ علاقه‌مندی':'🤍 علاقه‌مندی'}</button>
+      <button class="btn-delete" onclick="deleteRecipe(${r.id})">🗑 حذف</button>
+    </div>
+    <button class="btn-close-detail" onclick="closeDetail()">بستن</button>`;
+  document.getElementById('detail-overlay').classList.add('open');
+}
+function closeDetail() { document.getElementById('detail-overlay').classList.remove('open'); }
+
+function toggleFav(id) { const r=recipes.find(x=>x.id===id); if(!r)return; r.fav=!r.fav; save(); renderAll(); openDetail(id); }
+function deleteRecipe(id) { if(!confirm('این دستور حذف شود؟'))return; recipes=recipes.filter(x=>x.id!==id); save(); renderAll(); closeDetail(); }
+
+/* CATEGORY MANAGER */
+function openCatManager() {
+  renderCatList();
+  document.getElementById('new-cat-input').value = '';
+  document.getElementById('cat-overlay').classList.add('open');
+}
+function closeCatManager() { document.getElementById('cat-overlay').classList.remove('open'); renderAll(); }
+
+function renderCatList() {
+  document.getElementById('cat-list').innerHTML = categories.map((c,i) => `
+    <div class="cat-item">
+      <span>${c}</span>
+      <button class="cat-del-btn" onclick="deleteCat(${i})" title="حذف">✕</button>
+    </div>`).join('') || '<p style="color:var(--muted);font-size:13px;text-align:center">هنوز دسته‌بندی ندارید</p>';
+}
+
+function addCategory() {
+  const inp = document.getElementById('new-cat-input');
+  const val = inp.value.trim();
+  if (!val) return;
+  if (categories.includes(val)) { alert('این دسته‌بندی قبلاً وجود دارد'); return; }
+  categories.push(val);
+  save(); inp.value = ''; renderCatList();
+}
+
+function deleteCat(i) {
+  const cat = categories[i];
+  const count = recipes.filter(r => r.cat === cat).length;
+  if (count && !confirm(`دسته‌بندی "${cat}" در ${toF(count)} دستور استفاده شده. حذف شود؟`)) return;
+  categories.splice(i, 1); save(); renderCatList();
+  if (activeFilter === cat) activeFilter = 'همه';
+}
+
+function overlayClick(e, id, fn) { if(e.target===document.getElementById(id)) fn(); }
+
+/* PWA */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+}
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault(); deferredPrompt = e;
+  const wrap = document.getElementById('install-banner-wrap');
+  const dismissed = localStorage.getItem('install-dismissed');
+  if (!dismissed) {
+    wrap.innerHTML = `<div class="install-banner">📲 این اپ را به صفحه اصلی گوشیت اضافه کن!<button onclick="installApp()">نصب</button><button class="close-banner" onclick="dismissBanner()">✕</button></div>`;
+  }
+});
+function installApp() { if(!deferredPrompt)return; deferredPrompt.prompt(); deferredPrompt.userChoice.then(()=>{ deferredPrompt=null; document.getElementById('install-banner-wrap').innerHTML=''; }); }
+function dismissBanner() { localStorage.setItem('install-dismissed','1'); document.getElementById('install-banner-wrap').innerHTML=''; }
+
+load();
+</script>
+</body>
+</html>
