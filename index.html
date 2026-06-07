@@ -219,11 +219,21 @@ function setSyncStatus(s) {
 }
 
 // ── AUTH ─────────────────────────────────────────────────────
+const OWNER_EMAIL = 'habibkarimian1990@gmail.com';
+
 onAuthStateChanged(auth, user => {
-  currentUser = user;
-  // render login/logout button
+  // Only allow the owner email to be considered logged in as editor
+  currentUser = (user && user.email === OWNER_EMAIL) ? user : null;
   const wrap = document.getElementById('auth-wrap');
-  if(user) {
+  if(user && user.email !== OWNER_EMAIL) {
+    // Wrong account — sign them out silently
+    signOut(auth);
+    wrap.innerHTML = '';
+    document.getElementById('fab').classList.add('hidden');
+    renderAll();
+    return;
+  }
+  if(currentUser) {
     wrap.innerHTML = `<button class="btn-logout" id="logout-btn">
       ${user.photoURL?`<img src="${user.photoURL}" class="user-avatar">`:'👤'} خروج
     </button>`;
